@@ -22,7 +22,7 @@ root.tk_setPalette(background='#d080cd', foreground='#11307d')
 # entry field for new card
 def entry_field(frm):
     e = tk.Entry(frm)
-    e.grid(column=0, row=card_row)
+    e.grid(column=0, row=99)
     card = ''
     e.bind('<Return>', lambda event=None: save_card(event, frm, card, e))
     return e
@@ -52,12 +52,12 @@ def create():
     for btn in [x for _, x in sorted(zip(active_rows, active))]:
         row = [x['ROW'] for x in table.find(CARD=str(btn))][0]
         btn.grid(column=0, row=row, sticky='ew')
-        btn.bind('<Button-1>', lambda event=None: show_contents(event, frm1))
+        btn.bind('<Button-1>', lambda event=None: show_contents(event, frm1, e))
         card_row += 1
     for btn in [x for _, x in sorted(zip(closed_rows, closed))]:
         row = [x['ROW'] for x in table.find(CARD=str(btn))][0]
         btn.grid(column=99, row=row, sticky='ew')
-        btn.bind('<Button-1>', lambda event=None: show_contents(event, frm1))
+        btn.bind('<Button-1>', lambda event=None: show_contents(event, frm1, e))
     e = entry_field(frm1)
     return frm1, e
 # create all buttons in the order they were first created, no matter current row or column
@@ -163,13 +163,14 @@ def done(btn, frm, e):
     db.query(f'UPDATE todos SET ROW = ROW - 1 WHERE COLUMN = 0 AND ROW > {row}')
     active = [x for x in frm.winfo_children() 
         if x.winfo_class() == 'Button' and x.grid_info()['column'] == 0 and x.grid_info()['row'] > row]
+    global card_row
+    card_row = 1
     for widget in active:
         widget.grid(column=0, row=widget.grid_info()['row'] - 1)
+        card_row += 1
     e.destroy()
-    entry_field(frm1)
+    #entry_field(frm1)
 
-    # move btn to top of done list (row=1, all other btn row+=1)
-    # reorder orginal list: row -= 1 if row > row of btn marked as done
    
 
 if __name__ == '__main__':
